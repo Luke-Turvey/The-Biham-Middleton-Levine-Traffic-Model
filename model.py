@@ -1,25 +1,24 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors as clt
+import pygame
+import time
 
+# Parameters to vary in the model are N, p, cell_size
 
 N = 200 # Grid size
+p = 0.6 # Total density
+cell_size = 4
 
-total_time = 500
 
-p_right = 0.3
-p_up = 0.3
+p_right = 0.5 * p
+p_up = 0.5 * p
 
 n_right = int(p_right * N**2) # No. of right cells
 n_up = int(p_up * N**2) # No. of up cells
 
 n_empty = N**2 - n_right - n_up # No. of empty cells
 
-p = p_right + p_up # Total density
-
-
 empty_cell = 0
-up_cell = -1
+up_cell = 2
 right_cell = 1
 
 list_grid = [empty_cell] * n_empty + [right_cell] * n_right + [up_cell ] * n_up
@@ -75,18 +74,41 @@ def traffic_iteration(grid,t,N):
 
 
 
-# In this colourmap:
-# Right cells -> Red
-# Up cells -> Blue
-# Empty cells -> White
 
-fig=plt.figure(figsize=(12,8), dpi= 100, facecolor='w', edgecolor='k')
+screen_display = pygame.display.set_mode((cell_size*N,cell_size*N))
+clock = pygame.time.Clock()
+pygame.display.set_caption("BML Traffic Model")
+
+def draw_grid(array):
+
+    array = np.flip(array)
+
+    # Right cells -> Red
+    # Up cells -> Blue
+    # Empty cells -> Black
+
+    colours = [(255,255,255),(0,0,255),(255,0,0)]
+
+    for i in range(N):
+        for j in range(N):
+            pygame.draw.rect(screen_display, colours[array[i][j]], (cell_size*i, cell_size*j, cell_size,cell_size))
 
 iter_grid = grid
+t=0
 
-for t in range(1,total_time):
+run = True
+
+while run:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run= False
+
+    draw_grid(iter_grid)
+    pygame.display.flip()
+    
+    t += 1
     iter_grid = traffic_iteration(iter_grid,t,N)
+    clock.tick(10)
 
-plt.imshow(iter_grid,cmap = 'coolwarm')
 
-plt.show()
+pygame.quit()
