@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # Parameters to vary in the model are N, p, cell_size
 class BML_model():
 
-    def __init__(self,N,p,cell_size = 4, initilisation= "random"):
+    def __init__(self,N,p,cell_size = 4, initilisation= "random",boundary="periodic"):
         self.N = N # Grid size
         self.p = p # Total density
         self.cell_size = cell_size # Size of each cell (Change to alter size of display)
@@ -24,6 +24,8 @@ class BML_model():
         self.empty_cell = 0
         self.right_cell = 1
         self.up_cell = 2
+
+        self.boundary = boundary
 
         if initilisation == "random":
             # Random initilisation of grid for correct densities.
@@ -58,11 +60,14 @@ class BML_model():
                             else:
                                 self.new_grid[i,j] = self.right_cell
                         elif j == self.N-1:
-                            if self.grid[i,0] == self.empty_cell:
-                                self.new_grid[i,0] = self.right_cell
-                                right_velocity_count += 1
-                            else:
-                                self.new_grid[i,j] = self.right_cell
+                            if self.boundary == "periodic":
+                                if self.grid[i,0] == self.empty_cell:
+                                    self.new_grid[i,0] = self.right_cell
+                                    right_velocity_count += 1
+                                else:
+                                    self.new_grid[i,j] = self.right_cell
+                            elif self.boundary == "nonperiodic":
+                                    right_velocity_count += 1
                     else:
                         self.new_grid[i,j] = self.right_cell
                             
@@ -77,11 +82,14 @@ class BML_model():
                             else:
                                 self.new_grid[i,j] = self.up_cell
                         elif i == 0:
-                            if self.grid[self.N-1,j] == self.empty_cell:
-                                self.new_grid[self.N-1,j] = self.up_cell
+                            if self.boundary == "periodic":
+                                if self.grid[self.N-1,j] == self.empty_cell:
+                                    self.new_grid[self.N-1,j] = self.up_cell
+                                    up_velocity_count += 1
+                                else:
+                                    self.new_grid[i,j] = self.up_cell
+                            elif self.boundary == "nonperiodic":
                                 up_velocity_count += 1
-                            else:
-                                self.new_grid[i,j] = self.up_cell
                     else:
                         self.new_grid[i,j] = self.up_cell
 
@@ -106,9 +114,10 @@ class BML_model():
             for j in range(self.N):
                 pygame.draw.rect(self.screen_display, colours[array[i][j]], (self.cell_size*i, self.cell_size*j, self.cell_size,self.cell_size))
 
-    def simulate(self,draw= True, velocity_graphs=True,time_limit = 1000):
+    def simulate(self,draw= True, velocity_graphs=True,time_limit = False,end_on_jam=True,iteration_count= False):
 
         run = True
+        end = False
         
         t = 0
 
@@ -131,14 +140,41 @@ class BML_model():
                 pygame.display.flip()
             
             t += 1
-            avg_up_velocity, avg_right_velocity = self.traffic_iteration(t)     
+            avg_up_velocity, avg_right_velocity = self.traffic_iteration(t)
+            if iteration_count:
+                if not end:
+                    print(f"Iteration {t}")
 
-            if t % 2 == 1:
-                self.up_velocities.append(avg_up_velocity)
-            elif t % 2 == 0:
-                self.right_velocities.append(avg_right_velocity)
+            if not end:
+                if t % 2 == 1:
+                    self.up_velocities.append(avg_up_velocity)
+                elif t % 2 == 0:
+                    self.right_velocities.append(avg_right_velocity)
 
-            print(f"Iteration {t}")
+            try:
+                if self.up_velocities[-1]+self.right_velocities[-1] == 0:
+
+                    if end_on_jam:
+                        run = False
+
+                    if not end:
+                        if self.boundary == "periodic" :
+                            print(f"The model ran for {t} iterations before jamming")
+                        elif self.boundary == "nonperiodic":
+                            print(f"The model ran for {t} iterations before clearing")
+
+                        end=True
+
+                elif self.up_velocities[-1]+self.right_velocities[-1] == 2:
+
+                    if end_on_jam:
+                        run = False
+                    if not end:
+                        print(f"The model ran for {t} iterations before becoming freeflowing for the first time")
+
+                        end = True
+            except:
+                pass
 
             if time_limit == t:
                 run=False
@@ -159,5 +195,5 @@ class BML_model():
 
 
 
-bml = BML_model(200,0.5)
-bml.simulate(draw=False,velocity_graphs=True)
+bml = BML_model(N = 20, p = 0.45, cell_size = 10, initilisation = "random", boundary = "periodic")
+bml.simulate(draw = True, velocity_graphs = True, end_on_jam = False, iteration_count = True)
