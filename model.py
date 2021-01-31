@@ -6,23 +6,25 @@ import matplotlib.pyplot as plt
 # Parameters to vary in the model are N, p, cell_size
 
 N = 200 # Grid size
-p = 0.4 # Total density
-cell_size = 4
+p = 0.8 # Total density
+cell_size = 3 # Size of each cell (Change to alter size of display)
 
 
-p_right = 0.5 * p
-p_up = 0.5 * p
+p_right = 0.5 * p # Density of right cells
+p_up = 0.5 * p # Density of up cells
 
 n_right = int(p_right * N**2) # No. of right cells
 n_up = int(p_up * N**2) # No. of up cells
 
 n_empty = N**2 - n_right - n_up # No. of empty cells
 
+# Numerical representations of cells in grid matrix
 empty_cell = 0
-up_cell = 2
 right_cell = 1
+up_cell = 2
 
 
+# Random initilisation of grid for correct densities.
 list_grid = [empty_cell] * n_empty + [right_cell] * n_right + [up_cell ] * n_up
 grid = np.array(list_grid)
 np.random.shuffle(grid)
@@ -30,6 +32,8 @@ grid = np.reshape(grid,(N,N))
 
 
 def traffic_iteration(grid,t,N):
+    """This function iterates over the grid matrix and updates the cells according to the rules of the BML Model. It also calculates the average velocity of the up and right 
+    cells for each time step"""
 
     new_grid_list = [empty_cell] * (N**2)
     new_grid = np.array(new_grid_list,dtype=int).reshape((N,N))
@@ -85,7 +89,7 @@ def traffic_iteration(grid,t,N):
     return new_grid, avg_up_velocity, avg_right_velocity
 
 
-
+pygame.init()
 
 screen_display = pygame.display.set_mode((cell_size*N,cell_size*N))
 clock = pygame.time.Clock()
@@ -137,7 +141,7 @@ pygame.quit()
 fig, ax = plt.subplots(figsize = ( 12, 9 ))
 ax.set_xlabel("Time",size = 12)
 ax.set_ylabel("Average 'North' velocity",size = 12)
-ax.set_title("Average 'North' velocity through time of BML model") 
+ax.set_title(f"Average 'North' velocity through time, p = {p}") 
 
 plt.plot(up_velocities)
 plt.show()
@@ -145,7 +149,7 @@ plt.show()
 fig, ax = plt.subplots(figsize = ( 12 , 9 ))
 ax.set_xlabel("Time",size = 12)
 ax.set_ylabel("Average 'East' velocity",size = 12)
-ax.set_title("Average 'East' velocity through time of BML model.") 
+ax.set_title(f"Average 'East' velocity through time, p = {p}.") 
 
 plt.plot(right_velocities)
 plt.show()
