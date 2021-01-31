@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 # Parameters to vary in the model are N, p, cell_size
 
-N = 200 # Grid size
-p = 0.8 # Total density
-cell_size = 3 # Size of each cell (Change to alter size of display)
+N = 50 # Grid size
+p = 0.6 # Total density
+cell_size = 10 # Size of each cell (Change to alter size of display)
 
 
 p_right = 0.5 * p # Density of right cells
@@ -140,16 +140,11 @@ pygame.quit()
 
 fig, ax = plt.subplots(figsize = ( 12, 9 ))
 ax.set_xlabel("Time",size = 12)
-ax.set_ylabel("Average 'North' velocity",size = 12)
-ax.set_title(f"Average 'North' velocity through time, p = {p}") 
+ax.set_ylabel("Average velocity",size = 12)
+ax.set_title(f"Average velocity through time, p = {p}, N={N}") 
 
-plt.plot(up_velocities)
+plt.plot(up_velocities,label = "North Velocities")
+plt.plot(right_velocities, label = "East Velocities")
+plt.legend()
 plt.show()
 
-fig, ax = plt.subplots(figsize = ( 12 , 9 ))
-ax.set_xlabel("Time",size = 12)
-ax.set_ylabel("Average 'East' velocity",size = 12)
-ax.set_title(f"Average 'East' velocity through time, p = {p}.") 
-
-plt.plot(right_velocities)
-plt.show()
