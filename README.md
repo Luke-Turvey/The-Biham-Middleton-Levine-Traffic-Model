@@ -1,4 +1,4 @@
-# The-Biham-Middleton-Levine-Traffic-Model
+# The Biham Middleton Levine Traffic Model
 The BML Traffic Model is an extremely simple cellular automaton rule involving deterministic motion in discrete time of "cars" located on the cells of a square grid. Despite its simplicity and popularity, very little is known rigorously. Particularly mysterious are the phenomena of phase transition and self-organization on the infinite grid.
 
 #### How does the BML Traffic Model traffic model work?
